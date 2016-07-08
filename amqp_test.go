@@ -11,6 +11,7 @@ import (
 	"errors"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -22,8 +23,8 @@ func TestGetQueueLengthNonExistentHost(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Error expected")
 	}
-	if got, want := err.Error(), "dial tcp: lookup non-existent-host: no such host"; got != want {
-		t.Errorf("Expected %s, got: %s", want, got)
+	if got, want := err.Error(), "dial tcp: lookup non-existent-host: no such host"; !strings.HasPrefix(got, want) {
+		t.Errorf("Expected err='%s', got: '%s'", want, got)
 	}
 }
 
@@ -33,7 +34,7 @@ func TestGetQueueLengthNonExistentQueue(t *testing.T) {
 		t.Fatalf("Error expected")
 	}
 	if got, want := err.Error(), `Exception (404) Reason: "NOT_FOUND - no queue 'non-existent-queue' in vhost '/'"`; got != want {
-		t.Errorf("Expected %s, got: %s", want, got)
+		t.Errorf("Expected err='%s', got: '%s'", want, got)
 	}
 }
 
