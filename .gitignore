@@ -22,3 +22,12 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+.vscode/
+.idea/
+.build/
+.dist/
+debug
+kube-amqp-autoscale
+autoscale
+cover.out

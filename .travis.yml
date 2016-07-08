@@ -1,0 +1,21 @@
+language: go
+
+go:
+  - 1.5
+  - 1.6
+
+services:
+  - rabbitmq
+
+env:
+ - AMQP_URI=amqp://guest:guest@127.0.0.1:5672// GOMAXPROCS=4
+
+before_install:
+  - go get github.com/pierrre/gotestcover
+  - go get golang.org/x/tools/cmd/cover
+
+script:
+  - $HOME/gopath/bin/gotestcover -v -coverprofile=cover.out --tags=integration ./...
+
+after_success:
+  - $HOME/gopath/bin/goveralls -service=travis-ci -coverprofile=cover.out
