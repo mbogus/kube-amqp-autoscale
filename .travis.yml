@@ -8,7 +8,7 @@ services:
   - rabbitmq
 
 env:
- - AMQP_URI=amqp://guest:guest@127.0.0.1:5672// GOMAXPROCS=4
+ - AMQP_URI=amqp://guest:guest@127.0.0.1:5672// GOMAXPROCS=4 GO15VENDOREXPERIMENT=1
 
 before_install:
   - go get github.com/pierrre/gotestcover
