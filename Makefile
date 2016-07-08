@@ -34,7 +34,7 @@ if [ -d $(DIST_DIR) ] ; then rm -rf $(DIST_DIR) ; fi
 depend:
 	go get -t -u github.com/streadway/amqp
 	go get -t -u github.com/mattn/go-sqlite3
-	go get -t -u k8s.io/kubernetes
+	if [ ! -d $(GOPATH)/src/k8s.io/kubernetes ] ; then git clone https://github.com/kubernetes/kubernetes.git $(GOPATH)/src/k8s.io/kubernetes ; fi
 
 install:
 	go install $(TARGET)
