@@ -23,7 +23,7 @@ func TestGetQueueLengthNonExistentHost(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Error expected")
 	}
-	if got, want := err.Error(), "dial tcp: lookup non-existent-host: no such host"; !strings.HasPrefix(got, want) {
+	if got, want := err.Error(), "dial tcp: lookup non-existent-host"; !strings.HasPrefix(got, want) {
 		t.Errorf("Expected err='%s', got: '%s'", want, got)
 	}
 }
