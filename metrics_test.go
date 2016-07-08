@@ -11,7 +11,6 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"strings"
 	"testing"
 	"time"
 )
@@ -48,16 +47,6 @@ func TestDbPathTempFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	if got, want := db, file.Name(); got != want {
-		t.Errorf("Expected dbPath='%s', got: '%s'", want, got)
-	}
-}
-
-func TestDbPathInvalidFile(t *testing.T) {
-	_, err := dbPath(os.TempDir(), os.TempDir())
-	if err == nil {
-		t.Fatalf("Error expected")
-	}
-	if got, want := err.Error(), "Invalid database filename"; !strings.HasPrefix(got, want) {
 		t.Errorf("Expected dbPath='%s', got: '%s'", want, got)
 	}
 }
