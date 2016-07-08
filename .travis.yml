@@ -11,14 +11,13 @@ env:
  - AMQP_URI=amqp://guest:guest@127.0.0.1:5672// GOMAXPROCS=4 GO15VENDOREXPERIMENT=1
 
 before_install:
-  - go get github.com/pierrre/gotestcover
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/streadway/amqp
   - go get github.com/mattn/go-sqlite3
   - mkdir -p $HOME/gopath/src/k8s.io && git clone --depth 1 https://github.com/kubernetes/kubernetes.git $HOME/gopath/src/k8s.io/kubernetes
 
 script:
-  - $HOME/gopath/bin/gotestcover -v -coverprofile=cover.out --tags=integration ./...
+  - go test -v -covermode=count -coverprofile=cover.out --tags=integration ./...
 
 after_success:
-  - $HOME/gopath/bin/goveralls -service=travis-ci -coverprofile=cover.out
+  - $HOME/gopath/bin/goveralls -coverprofile=cover.out -service=travis-ci -repotoken $COVERALLS_TOKEN
