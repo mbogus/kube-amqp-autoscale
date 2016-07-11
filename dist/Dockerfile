@@ -25,6 +25,7 @@ RUN \
     make && \
     mkdir -p ${BIN_DIR} && \
     mv .build/autoscale ${BIN_DIR} && cp dist/docker-entrypoint.sh ${BIN_DIR} && \
+    chmod +x ${BIN_DIR}/* && \
     cd ${HOME} && \
     rm -rf ${GOPATH} && \
     rm -rf /usr/local/go && \

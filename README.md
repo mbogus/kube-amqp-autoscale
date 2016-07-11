@@ -1,8 +1,8 @@
 # kube-amqp-autoscale
 
-Dynamically scale kubernetes resources using the length of an AMQP queue
-(number of messages available for retrieval from the queue) to determine
-the load on an application/Kubernetes pod
+Dynamically scale kubernetes resources using length of an AMQP queue
+(number of messages available for retrieval from the queue) to
+determine the load on an application/Kubernetes pod
 
 
 ## Status
