@@ -12,6 +12,7 @@ env:
 
 before_install:
   - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
   - go get github.com/streadway/amqp
   - go get github.com/mattn/go-sqlite3
   - mkdir -p $HOME/gopath/src/k8s.io && git clone --depth 1 https://github.com/kubernetes/kubernetes.git $HOME/gopath/src/k8s.io/kubernetes

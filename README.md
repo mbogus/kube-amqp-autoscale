@@ -46,7 +46,7 @@ Run `make depend && make [build]`
 ## Runtime command-line arguments
 
 * **`amqp-uri`** required, RabbitMQ broker URI, e.g. `amqp://guest:guest@127.0.0.1:5672//`
-* **`amqp-queue`** required, RabbitMQ queue to measure load on an application
+* **`amqp-queue`** required, RabbitMQ queue name to measure load on an application
 * **`api-url`** required, Kubernetes API URL, e.g. `http://127.0.0.1:8080`
 * `api-user` optional, username for basic authentication on Kubernetes API
 * `api-passwd` optional, password for basic authentication on Kubernetes API
