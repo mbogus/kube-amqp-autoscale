@@ -30,7 +30,7 @@ func init() {
 	flag.StringVar(&kindParam, "kind", "Deployment", "type of the Kubernetes resource to autoscale")
 	flag.StringVar(&namespaceParam, "ns", "default", "Kubernetes namespace")
 	flag.IntVar(&intervalParam, "interval", 30, "time interval between Kubernetes resource scale runs in secs")
-	flag.IntVar(&thresholdParam, "threshold", -1, "number of messages on a queue representing maximum load on the autocaled Kubernetes resource")
+	flag.IntVar(&thresholdParam, "threshold", -1, "number of messages on a queue representing maximum load on the autoscaled Kubernetes resource")
 	flag.IntVar(&increaseLimitParam, "increase-limit", -1, "number of messages on a queue representing maximum load on the autocaled Kubernetes resource")
 	flag.IntVar(&decreaseLimitParam, "decrease-limit", -1, "number of messages on a queue representing maximum load on the autocaled Kubernetes resource")
 	flag.IntVar(&statsIntervalParam, "stats-interval", 5, "time interval between metrics gathering runs in seconds")

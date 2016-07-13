@@ -1,13 +1,9 @@
 # kube-amqp-autoscale
 
-Dynamically scale kubernetes resources using length of an AMQP queue
-(number of messages available for retrieval from the queue) to
-determine the load on an application/Kubernetes pod.
+Dynamically scale kubernetes resources using length of an AMQP queue (number of messages available for retrieval from the queue) to determine the load on an application/Kubernetes pod.
 
 **NOTICE**
-If your application load is not queue-bound but rather CPU-sensitive, make
-sure to use built-in Kubernetes [Horizontal Pod Autoscaling](http://kubernetes.io/docs/user-guide/horizontal-pod-autoscaling/)
-instead of this project.
+If your application load is not queue-bound but rather CPU-sensitive, make sure to use built-in Kubernetes [Horizontal Pod Autoscaling](http://kubernetes.io/docs/user-guide/horizontal-pod-autoscaling/) instead of this project.
 
 ## Status
 
@@ -63,7 +59,7 @@ Run `make depend && make [build]`
 * `kind` type of the Kubernetes resource to autoscale, one of `Deployment`, `ReplicationController`, `ReplicaSet` (default `Deployment`)
 * `ns` Kubernetes namespace (default `default`)
 * `interval` time interval between Kubernetes resource scale runs in secs (default `30`)
-* **`threshold`** required, number of messages on a queue representing maximum load on the autocaled Kubernetes resource
+* **`threshold`** required, number of messages on a queue representing maximum load on the autoscaled Kubernetes resource
 * `increase-limit` limit number of Kubernetes pods to be provisioned in a single scale iteration to max of the value, set to a number greater than 0, default `unbounded`
 * `decrease-limit` limit number of Kubernetes pods to be terminated in a single scale iteration to max of the value, set to a number greater than 0, default `unbounded`
 * `stats-interval` time interval between metrics gathering runs in seconds (default `5`)
