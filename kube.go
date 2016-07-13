@@ -62,6 +62,7 @@ func scaleDeployments(c *client.Client, ns string, name string, newSize int32, b
 	replicas := b.newSize(pod.Spec.Replicas, newSize)
 	if replicas != pod.Spec.Replicas {
 		log.Printf("Scaling deployment '%s' from %d to %d replicas", name, pod.Spec.Replicas, replicas)
+		pod.Spec.Replicas = replicas
 		_, err = c.Deployments(ns).Update(pod)
 		if err != nil {
 			return err
@@ -78,6 +79,7 @@ func scaleReplicationControllers(c *client.Client, ns string, name string, newSi
 	replicas := b.newSize(pod.Spec.Replicas, newSize)
 	if replicas != pod.Spec.Replicas {
 		log.Printf("Scaling replication controller '%s' from %d to %d replicas", name, pod.Spec.Replicas, replicas)
+		pod.Spec.Replicas = replicas
 		_, err = c.ReplicationControllers(ns).Update(pod)
 		if err != nil {
 			return err
@@ -94,6 +96,7 @@ func scaleReplicaSets(c *client.Client, ns string, name string, newSize int32, b
 	replicas := b.newSize(pod.Spec.Replicas, newSize)
 	if replicas != pod.Spec.Replicas {
 		log.Printf("Scaling replica set '%s' from %d to %d replicas", name, pod.Spec.Replicas, replicas)
+		pod.Spec.Replicas = replicas
 		_, err = c.ReplicaSets(ns).Update(pod)
 		if err != nil {
 			return err
