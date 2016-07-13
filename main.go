@@ -140,7 +140,7 @@ func main() {
 	defer db.Close()
 	createTable(db)
 
-	forever := make(chan struct{}, 1)
+	forever := make(chan struct{})
 
 	duration := evalIntervalsParam * intervalParam
 	fsample := func(n int) error { return updateMetrics(db, n, duration) }

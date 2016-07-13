@@ -33,7 +33,7 @@ func TestNewSize(t *testing.T) {
 }
 
 func TestAutoscaleClosedChannel(t *testing.T) {
-	forever := make(chan struct{}, 1)
+	forever := make(chan struct{})
 	close(forever)
 	var err error
 	autoscale(func() (*queueMetrics, error) { return nil, errors.New("error") }, &scaleContext{}, forever)
