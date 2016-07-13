@@ -2,8 +2,12 @@
 
 Dynamically scale kubernetes resources using length of an AMQP queue
 (number of messages available for retrieval from the queue) to
-determine the load on an application/Kubernetes pod
+determine the load on an application/Kubernetes pod.
 
+**NOTICE**
+If your application load is not queue-bound but rather CPU-sensitive, make
+sure to use built-in Kubernetes [Horizontal Pod Autoscaling](http://kubernetes.io/docs/user-guide/horizontal-pod-autoscaling/)
+instead of this project.
 
 ## Status
 
