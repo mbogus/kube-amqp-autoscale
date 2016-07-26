@@ -2,7 +2,9 @@
 
 Dynamically scale kubernetes resources using length of an AMQP queue (number of messages available for retrieval from the queue) to determine the load on an application/Kubernetes pod.
 
+
 **NOTICE**
+
 If your application load is not queue-bound but rather CPU-sensitive, make sure to use built-in Kubernetes [Horizontal Pod Autoscaling](http://kubernetes.io/docs/user-guide/horizontal-pod-autoscaling/) instead of this project.
 
 ## Status
@@ -10,6 +12,12 @@ If your application load is not queue-bound but rather CPU-sensitive, make sure 
 *Alpha*
 
 [![Build Status](https://travis-ci.org/mbogus/kube-amqp-autoscale.svg?branch=master)](https://travis-ci.org/mbogus/kube-amqp-autoscale)  [![Coverage Status](https://coveralls.io/repos/github/mbogus/kube-amqp-autoscale/badge.svg?branch=master)](https://coveralls.io/github/mbogus/kube-amqp-autoscale?branch=master)
+
+
+## Usage
+
+The best way to use the service is by importing [automated build docker container](https://hub.docker.com/r/mbogus/kube-amqp-autoscale/).
+Please follow the instructions on the automated build page.
 
 
 ## Go get
