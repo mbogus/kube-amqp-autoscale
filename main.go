@@ -125,6 +125,8 @@ func main() {
 		os.Exit(0)
 	}
 
+	log.SetFlags(0)
+
 	if err := validateParams(); err != nil {
 		log.Fatal(err)
 	}
