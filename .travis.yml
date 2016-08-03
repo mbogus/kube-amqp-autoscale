@@ -15,7 +15,7 @@ before_install:
   - go get github.com/mattn/goveralls
   - go get github.com/streadway/amqp
   - go get github.com/mattn/go-sqlite3
-  - mkdir -p $HOME/gopath/src/k8s.io && git clone --depth 1 -b v1.3.3 -q https://github.com/kubernetes/kubernetes.git $HOME/gopath/src/k8s.io/kubernetes
+  - mkdir -p $HOME/gopath/src/k8s.io && git clone --depth 1 -b v1.3.4 -q https://github.com/kubernetes/kubernetes.git $HOME/gopath/src/k8s.io/kubernetes
 
 script:
   - go test -v -covermode=count -coverprofile=cover.out --tags=integration ./...
