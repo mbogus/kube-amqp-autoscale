@@ -24,7 +24,7 @@ endif
 default: build
 
 build: vet
-	go build -v -ldflags "-s -w -X main.Version=$(VERSION) -X main.BuildType=$(BUILD_TYPE) -X main.Build=$(BUILD) -X main.BuildDate=$(BUILD_DATE)" -o $(TARGET)
+	go build -v -buildmode=exe -ldflags "-s -w -X main.Version=$(VERSION) -X main.BuildType=$(BUILD_TYPE) -X main.Build=$(BUILD) -X main.BuildDate=$(BUILD_DATE)" -o $(TARGET)
 
 clean:
 	go clean -i ./... && \
@@ -32,8 +32,8 @@ if [ -d $(BUILD_DIR) ] ; then rm -rf $(BUILD_DIR) ; fi && \
 if [ -d $(DIST_DIR) ] ; then rm -rf $(DIST_DIR) ; fi
 
 depend:
-	go get -t -u github.com/streadway/amqp
-	go get -t -u github.com/mattn/go-sqlite3
+	go get -u -ldflags "-s -w" github.com/streadway/amqp
+	go get -u -ldflags "-s -w" github.com/mattn/go-sqlite3
 	if [ -d $(GOPATH)/src/k8s.io/kubernetes ] ; then rm -rf $(GOPATH)/src/k8s.io/kubernetes ; fi && git clone --depth 1 -b v1.3.5 -q https://github.com/kubernetes/kubernetes.git $(GOPATH)/src/k8s.io/kubernetes
 
 install:
