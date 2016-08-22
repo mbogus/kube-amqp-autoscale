@@ -1,15 +1,13 @@
 language: go
 
 go:
-  - 1.5
-  - 1.6
   - 1.7
 
 services:
   - rabbitmq
 
 env:
- - AMQP_URI=amqp://guest:guest@127.0.0.1:5672// GOMAXPROCS=4 GO15VENDOREXPERIMENT=1
+ - AMQP_URI=amqp://guest:guest@127.0.0.1:5672// GOMAXPROCS=4
 
 before_install:
   - go get -u -buildmode=exe -ldflags "-s -w" golang.org/x/tools/cmd/cover
