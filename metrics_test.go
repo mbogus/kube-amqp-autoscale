@@ -28,7 +28,7 @@ func TestDbPathMemory(t *testing.T) {
 func TestDbPathNoFileDir(t *testing.T) {
 	_, err := dbPath("", "")
 	if err == nil {
-		t.Fatalf("Error expected")
+		t.Fatal("Error expected")
 	}
 	if got, want := err.Error(), "Missing directory and/or filename for the metrics database"; got != want {
 		t.Errorf("Expected dbPath='%s', got: '%s'", want, got)

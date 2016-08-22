@@ -61,7 +61,7 @@ func TestAPIConfigBasicAuth(t *testing.T) {
 func TestAPIConfigTokenNonExistentFile(t *testing.T) {
 	_, err := apiConfig("http://127.0.0.1:8080", "", "", "/tmp/file-that-does-not-exist", "", false)
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "open /tmp/file-that-does-not-exist: no such file or directory"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -72,7 +72,7 @@ func TestAPIContextClientNoURL(t *testing.T) {
 	ctx := apiContext{}
 	_, err := ctx.client()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "API URL must be defined"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)

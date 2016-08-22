@@ -14,7 +14,7 @@ func TestNewSizeNoCoverage(t *testing.T) {
 	sc := scaleContext{Coverage: 0.75}
 	_, err := sc.newSize(0.0, 0.5)
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Not enough metrics to calculate new size, required at least 0.75 was 0.50 metrics ratio"; got != want {
 		t.Errorf("Expected %s, got: %s", want, got)

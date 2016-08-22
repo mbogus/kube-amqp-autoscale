@@ -39,7 +39,7 @@ func TestSetVersion(t *testing.T) {
 func TestValidateParams(t *testing.T) {
 	err := validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Missing RabbitMQ URI"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -48,7 +48,7 @@ func TestValidateParams(t *testing.T) {
 
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Missing RabbitMQ queue name"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -57,7 +57,7 @@ func TestValidateParams(t *testing.T) {
 
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Missing Kubernetes API URL"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -67,7 +67,7 @@ func TestValidateParams(t *testing.T) {
 	intervalParam = 0
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Invalid auto-scale interval '0'"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -77,7 +77,7 @@ func TestValidateParams(t *testing.T) {
 	thresholdParam = 0
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Invalid threshold value '0'"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -87,7 +87,7 @@ func TestValidateParams(t *testing.T) {
 	statsIntervalParam = 15
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Interval for saving statistics '15' should be smaller than auto-scale interval '10'"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -97,7 +97,7 @@ func TestValidateParams(t *testing.T) {
 	statsCoverageParam = 1.5
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Invalid metrics coverage ratio '1.50'"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -107,7 +107,7 @@ func TestValidateParams(t *testing.T) {
 	minParam = -1
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Invalid lower limit for the number of pods '-1'"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -117,7 +117,7 @@ func TestValidateParams(t *testing.T) {
 	maxParam = 1
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Upper limit for the number of pods '1' must be greater than lower limit '1'"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -126,7 +126,7 @@ func TestValidateParams(t *testing.T) {
 
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Missing name of the resource to autoscale"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -136,7 +136,7 @@ func TestValidateParams(t *testing.T) {
 	kindParam = ""
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Missing kind of the resource to autoscale"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -145,7 +145,7 @@ func TestValidateParams(t *testing.T) {
 	kindParam = "X"
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Invalid kind of the resource 'X'"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
@@ -155,7 +155,7 @@ func TestValidateParams(t *testing.T) {
 	namespaceParam = ""
 	err = validateParams()
 	if err == nil {
-		t.Fatalf("Expected error")
+		t.Fatal("Expected error")
 	}
 	if got, want := err.Error(), "Missing namespace of the resource to autoscale"; got != want {
 		t.Errorf("Expected error='%s', got: '%s'", want, got)
