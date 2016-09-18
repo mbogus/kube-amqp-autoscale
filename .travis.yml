@@ -14,7 +14,7 @@ before_install:
   - go get -u -buildmode=exe -ldflags "-s -w" github.com/mattn/goveralls
   - go get -u -ldflags "-s -w" github.com/streadway/amqp
   - go get -u -ldflags "-s -w" github.com/mattn/go-sqlite3
-  - mkdir -p $HOME/gopath/src/k8s.io && git clone --depth 1 -b v1.3.5 -q https://github.com/kubernetes/kubernetes.git $HOME/gopath/src/k8s.io/kubernetes
+  - mkdir -p $HOME/gopath/src/k8s.io && git clone --depth 1 -b v1.3.7 --single-branch -q https://github.com/kubernetes/kubernetes.git $HOME/gopath/src/k8s.io/kubernetes
 
 script:
   - go test -v -covermode=count -coverprofile=cover.out --tags=integration ./...
