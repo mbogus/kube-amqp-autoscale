@@ -27,6 +27,7 @@ _testmain.go
 .idea/
 .build/
 .dist/
+*.iml
 debug
 kube-amqp-autoscale
 autoscale
