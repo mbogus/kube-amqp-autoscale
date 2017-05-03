@@ -10,9 +10,11 @@ import (
 	"io/ioutil"
 	"log"
 
-	"k8s.io/kubernetes/pkg/client/restclient"
-	client "k8s.io/kubernetes/pkg/client/unversioned"
-	"k8s.io/kubernetes/pkg/util/crypto"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	restclient "k8s.io/client-go/rest"
+	certutil "k8s.io/client-go/util/cert"
+
+	"k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -42,7 +44,7 @@ func scale(kind string, ns string, name string, newSize int32, ctx *apiContext) 
 	return scaleKind(c, kind, ns, name, newSize, ctx.Bounds)
 }
 
-func scaleKind(c *client.Client, kind string, ns string, name string, newSize int32, b *scaleBounds) error {
+func scaleKind(c *kubernetes.Clientset, kind string, ns string, name string, newSize int32, b *scaleBounds) error {
 	switch kind {
 	case replicationControllerKind:
 		return scaleReplicationControllers(c, ns, name, newSize, b)
@@ -54,16 +56,13 @@ func scaleKind(c *client.Client, kind string, ns string, name string, newSize in
 	return fmt.Errorf("No scaler has been implemented for '%s'", kind)
 }
 
-func scaleDeployments(c *client.Client, ns string, name string, newSize int32, b *scaleBounds) error {
-	pod, err := c.Deployments(ns).Get(name)
-	if err != nil {
-		return err
-	}
-	replicas := b.newSize(pod.Spec.Replicas, newSize)
-	if replicas != pod.Spec.Replicas {
-		log.Printf("Scaling deployment '%s' from %d to %d replicas", name, pod.Spec.Replicas, replicas)
-		pod.Spec.Replicas = replicas
-		_, err = c.Deployments(ns).Update(pod)
+func scaleDeployments(c *kubernetes.Clientset, ns string, name string, newSize int32, b *scaleBounds) error {
+	deployment, err := c.AppsV1beta1().Deployments(ns).Get(name, v1.GetOptions{})
+	replicas := b.newSize(*deployment.Spec.Replicas, newSize)
+	if replicas != *deployment.Spec.Replicas {
+		log.Printf("Scaling deployment '%s' from %d to %d replicas", name, deployment.Spec.Replicas, replicas)
+		deployment.Spec.Replicas = &replicas
+		_, err = c.AppsV1beta1().Deployments(ns).Update(deployment)
 		if err != nil {
 			return err
 		}
@@ -71,15 +70,15 @@ func scaleDeployments(c *client.Client, ns string, name string, newSize int32, b
 	return nil
 }
 
-func scaleReplicationControllers(c *client.Client, ns string, name string, newSize int32, b *scaleBounds) error {
-	pod, err := c.ReplicationControllers(ns).Get(name)
+func scaleReplicationControllers(c *kubernetes.Clientset, ns string, name string, newSize int32, b *scaleBounds) error {
+	pod, err := c.ReplicationControllers(ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return err
 	}
-	replicas := b.newSize(pod.Spec.Replicas, newSize)
-	if replicas != pod.Spec.Replicas {
+	replicas := b.newSize(*pod.Spec.Replicas, newSize)
+	if replicas != *pod.Spec.Replicas {
 		log.Printf("Scaling replication controller '%s' from %d to %d replicas", name, pod.Spec.Replicas, replicas)
-		pod.Spec.Replicas = replicas
+		pod.Spec.Replicas = &replicas
 		_, err = c.ReplicationControllers(ns).Update(pod)
 		if err != nil {
 			return err
@@ -88,15 +87,15 @@ func scaleReplicationControllers(c *client.Client, ns string, name string, newSi
 	return nil
 }
 
-func scaleReplicaSets(c *client.Client, ns string, name string, newSize int32, b *scaleBounds) error {
-	pod, err := c.ReplicaSets(ns).Get(name)
+func scaleReplicaSets(c *kubernetes.Clientset, ns string, name string, newSize int32, b *scaleBounds) error {
+	pod, err := c.ReplicaSets(ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return err
 	}
-	replicas := b.newSize(pod.Spec.Replicas, newSize)
-	if replicas != pod.Spec.Replicas {
+	replicas := b.newSize(*pod.Spec.Replicas, newSize)
+	if replicas != *pod.Spec.Replicas {
 		log.Printf("Scaling replica set '%s' from %d to %d replicas", name, pod.Spec.Replicas, replicas)
-		pod.Spec.Replicas = replicas
+		pod.Spec.Replicas = &replicas
 		_, err = c.ReplicaSets(ns).Update(pod)
 		if err != nil {
 			return err
@@ -105,7 +104,7 @@ func scaleReplicaSets(c *client.Client, ns string, name string, newSize int32, b
 	return nil
 }
 
-func (ctx *apiContext) client() (*client.Client, error) {
+func (ctx *apiContext) client() (*kubernetes.Clientset, error) {
 	if ctx.clientConf == nil {
 		conf, err := apiConfig(ctx.URL, ctx.User, ctx.Passwd, ctx.TokenFile, ctx.CAFile, ctx.Insecure)
 		if err != nil {
@@ -113,7 +112,7 @@ func (ctx *apiContext) client() (*client.Client, error) {
 		}
 		ctx.clientConf = conf
 	}
-	return client.New(ctx.clientConf)
+	return kubernetes.NewForConfig(ctx.clientConf)
 }
 
 func apiConfig(apiURL string,
@@ -150,7 +149,7 @@ func apiConfig(apiURL string,
 
 	if len(apiCAFile) > 0 {
 		tlsClientConfig := restclient.TLSClientConfig{}
-		if _, err := crypto.CertPoolFromFile(apiCAFile); err != nil {
+		if _, err := certutil.NewPool(apiCAFile); err != nil {
 			log.Printf("Expected to load root CA config from '%s', but got err: %v", apiCAFile, err)
 		} else {
 			tlsClientConfig.CAFile = apiCAFile
