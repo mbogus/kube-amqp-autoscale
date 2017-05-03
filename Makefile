@@ -21,6 +21,8 @@ BUILD_TYPE:=DEV
 BUILD_DATE:=$(shell date +%FT%T%z)
 endif
 
+GOPATH ?= $(HOME)/go
+
 default: build
 
 build: vet
@@ -36,6 +38,7 @@ depend:
 	go get -u -ldflags "-s -w" github.com/mattn/go-sqlite3
 	go get -u -ldflags "-s -w" k8s.io/client-go/...
 	if [ -d $(GOPATH)/src/k8s.io/kubernetes ] ; then rm -rf $(GOPATH)/src/k8s.io/kubernetes ; fi && git clone --depth 1 -b v1.6.2 --single-branch -q https://github.com/kubernetes/kubernetes.git $(GOPATH)/src/k8s.io/kubernetes
+
 
 install:
 	go install $(TARGET)
