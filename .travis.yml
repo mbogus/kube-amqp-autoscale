@@ -15,6 +15,7 @@ before_install:
   - go get -u -buildmode=exe -ldflags "-s -w" github.com/mattn/goveralls
   - go get -u -ldflags "-s -w" github.com/streadway/amqp
   - go get -u -ldflags "-s -w" github.com/mattn/go-sqlite3
+  - go get -u -ldflags "-s -w" k8s.io/client-go/...
   - mkdir -p $HOME/gopath/src/k8s.io && git clone --depth 1 -b v1.6.2 --single-branch -q https://github.com/kubernetes/kubernetes.git $HOME/gopath/src/k8s.io/kubernetes
 
 script:
