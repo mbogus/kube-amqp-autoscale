@@ -37,7 +37,7 @@ depend:
 	go get -u -ldflags "-s -w" github.com/streadway/amqp
 	go get -u -ldflags "-s -w" github.com/mattn/go-sqlite3
 	go get -u -ldflags "-s -w" k8s.io/client-go/...
-	if [ -d $(GOPATH)/src/k8s.io/kubernetes ] ; then rm -rf $(GOPATH)/src/k8s.io/kubernetes ; fi && git clone --depth 1 -b v1.7.2 --single-branch -q https://github.com/kubernetes/kubernetes.git $(GOPATH)/src/k8s.io/kubernetes
+	if [ -d $(GOPATH)/src/k8s.io/kubernetes ] ; then rm -rf $(GOPATH)/src/k8s.io/kubernetes ; fi && git clone --depth 1 -b v1.7.8 --single-branch -q https://github.com/kubernetes/kubernetes.git $(GOPATH)/src/k8s.io/kubernetes
 
 
 install:
