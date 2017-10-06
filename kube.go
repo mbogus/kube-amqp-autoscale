@@ -46,8 +46,6 @@ func scale(kind string, ns string, name string, newSize int32, ctx *apiContext) 
 
 func scaleKind(c *kubernetes.Clientset, kind string, ns string, name string, newSize int32, b *scaleBounds) error {
 	switch kind {
-	case replicationControllerKind:
-		return scaleReplicationControllers(c, ns, name, newSize, b)
 	case replicaSetKind:
 		return scaleReplicaSets(c, ns, name, newSize, b)
 	case deploymentKind:
@@ -63,23 +61,6 @@ func scaleDeployments(c *kubernetes.Clientset, ns string, name string, newSize i
 		log.Printf("Scaling deployment '%s' from %d to %d replicas", name, deployment.Spec.Replicas, replicas)
 		deployment.Spec.Replicas = &replicas
 		_, err = c.AppsV1beta2().Deployments(ns).Update(deployment)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func scaleReplicationControllers(c *kubernetes.Clientset, ns string, name string, newSize int32, b *scaleBounds) error {
-	pod, err := c.ReplicationControllers(ns).Get(name, v1.GetOptions{})
-	if err != nil {
-		return err
-	}
-	replicas := b.newSize(*pod.Spec.Replicas, newSize)
-	if replicas != *pod.Spec.Replicas {
-		log.Printf("Scaling replication controller '%s' from %d to %d replicas", name, pod.Spec.Replicas, replicas)
-		pod.Spec.Replicas = &replicas
-		_, err = c.ReplicationControllers(ns).Update(pod)
 		if err != nil {
 			return err
 		}
