@@ -15,6 +15,8 @@ before_install:
   - go get -u -ldflags "-s -w" github.com/streadway/amqp
   - go get -u -ldflags "-s -w" github.com/mattn/go-sqlite3
   - go get -u -ldflags "-s -w" k8s.io/client-go/...
+  - go get -u -ldflags "-s -w" github.com/prometheus/client_golang/prometheus
+  - go get -u -ldflags "-s -w" github.com/prometheus/client_golang/prometheus/promhttp
   - mkdir -p $HOME/gopath/src/k8s.io && git clone --depth 1 -b v1.9.3 --single-branch -q https://github.com/kubernetes/kubernetes.git $HOME/gopath/src/k8s.io/kubernetes
 
 script:
