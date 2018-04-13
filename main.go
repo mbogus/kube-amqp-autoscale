@@ -10,14 +10,19 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"runtime"
+	"strings"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func init() {
 	setVersion()
 	flag.StringVar(&brokerURIParam, "amqp-uri", "", "RabbitMQ broker URI")
-	flag.StringVar(&queueNameParam, "amqp-queue", "", "RabbitMQ queue to measure load on an application")
+	flag.StringVar(&queueNameParam, "amqp-queue", "", "RabbitMQ queue to measure load on an application. Use comma separator to specify multiple queues.")
 	flag.StringVar(&apiURLParam, "api-url", "", "Kubernetes API URL")
 	flag.StringVar(&apiUserParam, "api-user", "", "username for basic authentication on Kubernetes API")
 	flag.StringVar(&apiPasswdParam, "api-passwd", "", "password for basic authentication on Kubernetes API")
@@ -38,9 +43,28 @@ func init() {
 	flag.Float64Var(&statsCoverageParam, "stats-coverage", 0.75, "required percentage of statistics to calculate average queue length")
 	flag.StringVar(&dbFileParam, "db", "file::memory:?cache=shared", "sqlite3 database filename")
 	flag.StringVar(&dbDirParam, "db-dir", "", "directory for sqlite3 statistics database file")
+	flag.StringVar(&metricsListenAddr, "metrics-listen-address", ":9505", "the address to listen on for exporting prometheus metrics")
 
 	flag.BoolVar(&version, "version", false, "show version")
+
+	prometheus.MustRegister(queueSizeCount)
+	prometheus.MustRegister(queueSizeAverage)
+	prometheus.MustRegister(queueSizeCoverage)
+	prometheus.MustRegister(buildInfo)
+	prometheus.MustRegister(queueCountSuccesses)
+	prometheus.MustRegister(queueCountFailures)
+	prometheus.MustRegister(pollCount)
+	prometheus.MustRegister(autoscaleErrors)
+	prometheus.MustRegister(desiredReplicas)
+	prometheus.MustRegister(scalingEvents)
+	prometheus.MustRegister(minPods)
+	prometheus.MustRegister(maxPods)
+	prometheus.MustRegister(scaleThreshold)
 }
+
+const (
+	namespace = "amqp_autoscaler"
+)
 
 var (
 	version            bool
@@ -66,6 +90,61 @@ var (
 	statsIntervalParam int
 	dbFileParam        string
 	dbDirParam         string
+	metricsListenAddr  string
+
+	buildInfo = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "build_info",
+			Help:      "Info about the build.",
+		},
+		[]string{"version", "go_version"},
+	)
+	maxPods = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "max_pods",
+			Help:      "Maximum pod count.",
+		},
+	)
+	minPods = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "min_pods",
+			Help:      "Minimum pod count.",
+		},
+	)
+	scaleThreshold = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "scale_threshold",
+			Help:      "Scaling threshold.",
+		},
+	)
+	queueSizeCount = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "current_queue_size",
+			Help:      "Current size of target queue.",
+		},
+		[]string{"queue"},
+	)
+	queueSizeAverage = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "average_queue_size",
+			Help:      "Average size of target queue.",
+		},
+		[]string{"queue"},
+	)
+	queueSizeCoverage = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "coverage_queue_size",
+			Help:      "Coverage size of target queue.",
+		},
+		[]string{"queue"},
+	)
 )
 
 func validateParams() error {
@@ -131,9 +210,19 @@ func main() {
 		log.Fatal(err)
 	}
 
+	buildInfo.With(prometheus.Labels{"version": appVersion, "go_version": runtime.Version()}).Set(1)
+	maxPods.Set(float64(maxParam))
+	minPods.Set(float64(minParam))
+	scaleThreshold.Set(float64(thresholdParam))
+
 	log.Printf("Starting %s %s", appName, appVersion)
 	log.Printf("System with %d CPUs and environment with %d max processes",
 		runtime.NumCPU(), runtime.GOMAXPROCS(0))
+
+	http.Handle("/metrics", promhttp.Handler())
+	go func() {
+		log.Fatal(http.ListenAndServe(metricsListenAddr, nil))
+	}()
 
 	db, err := connectToDB(&dbFileParam)
 	if err != nil {
@@ -146,10 +235,19 @@ func main() {
 
 	duration := evalIntervalsParam * intervalParam
 	fsample := func(n int) error { return updateMetrics(db, n, duration) }
-	go monitorQueue(brokerURIParam, queueNameParam, statsIntervalParam, fsample, forever)
+
+	queueNames := strings.Split(queueNameParam, ",")
+	log.Printf("Summing over %d queues: %s", len(queueNames), queueNameParam)
+	go monitorQueue(brokerURIParam, queueNames, statsIntervalParam, fsample, forever)
 
 	fmetrics := func() (*queueMetrics, error) {
-		return getMetrics(db, duration, statsIntervalParam)
+		metrics, err := getMetrics(db, duration, statsIntervalParam)
+		if err != nil {
+			queueSizeCount.With(prometheus.Labels{"queue": queueNameParam}).Set(float64(metrics.Count))
+			queueSizeAverage.With(prometheus.Labels{"queue": queueNameParam}).Set(metrics.Average)
+			queueSizeCoverage.With(prometheus.Labels{"queue": queueNameParam}).Set(metrics.Coverage)
+		}
+		return metrics, err
 	}
 
 	fscale := func(newSize int32) error {

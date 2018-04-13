@@ -142,7 +142,7 @@ func TestMonitorQueueClosedChannel(t *testing.T) {
 		return nil
 	}
 
-	monitorQueue("", "", 1, f, forever)
+	monitorQueue("", []string{""}, 1, f, forever)
 }
 
 func TestMonitorQueue(t *testing.T) {
@@ -197,11 +197,90 @@ func TestMonitorQueue(t *testing.T) {
 		return nil
 	}
 
-	monitorQueue(amqpURI(), tmpQ.Name, 1, f, forever)
+	monitorQueue(amqpURI(), []string{tmpQ.Name}, 1, f, forever)
 
 	_, err = ch.QueueDelete(tmpQ.Name, false, false, true)
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestMonitorQueueWithTwoQueues(t *testing.T) {
+	conn, err := amqp.Dial(amqpURI())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	ch, err := conn.Channel()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ch.Close()
+
+	tmpQ1, err := ch.QueueDeclare(
+		"queue1", // name
+		false,    // durable
+		true,     // delete when usused
+		false,    // exclusive
+		false,    // noWait
+		nil,      // arguments
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tmpQ2, err := ch.QueueDeclare(
+		"queue2", // name
+		false,    // durable
+		true,     // delete when usused
+		false,    // exclusive
+		false,    // noWait
+		nil,      // arguments
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	queueNames := []string{tmpQ1.Name, tmpQ2.Name}
+
+	for i := 0; i < 10; i++ {
+		for _, name := range queueNames {
+			err = ch.Publish(
+				"",    // exchange
+				name,  // routing key
+				false, // mandatory
+				false, // immediate
+				amqp.Publishing{
+					ContentType:   "text/plain",
+					Body:          []byte(strconv.Itoa(i)),
+					CorrelationId: strconv.Itoa(i),
+					DeliveryMode:  amqp.Persistent,
+				})
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+
+	forever := make(chan struct{}, 1)
+
+	f := func(i int) error {
+		if got, want := i, 20; got != want {
+			t.Errorf("Expected %d, got: %d", want, got)
+		}
+		close(forever)
+		return nil
+	}
+
+	monitorQueue(amqpURI(), queueNames, 1, f, forever)
+
+	for _, name := range queueNames {
+		_, err = ch.QueueDelete(name, false, false, true)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 }
 
@@ -214,7 +293,7 @@ func TestMonitorQueueGetQueueLengthError(t *testing.T) {
 		return nil
 	}
 
-	go monitorQueue("amqp://non-existent-host//", "no-queue", 1, f, forever)
+	go monitorQueue("amqp://non-existent-host//", []string{"no-queue"}, 1, f, forever)
 
 	time.Sleep(3 * time.Second)
 	close(forever)
@@ -255,7 +334,7 @@ func TestMonitorQueueSaveStatError(t *testing.T) {
 		return errors.New("Dummy error")
 	}
 
-	go monitorQueue(amqpURI(), tmpQ.Name, 1, f, forever)
+	go monitorQueue(amqpURI(), []string{tmpQ.Name}, 1, f, forever)
 
 	time.Sleep(3 * time.Second)
 	close(forever)
