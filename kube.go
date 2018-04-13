@@ -14,6 +14,7 @@ import (
 	restclient "k8s.io/client-go/rest"
 	certutil "k8s.io/client-go/util/cert"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -22,6 +23,17 @@ const (
 	jobKind                   = "Job"
 	replicationControllerKind = "ReplicationController"
 	replicaSetKind            = "ReplicaSet"
+)
+
+var (
+	scalingEvents = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Name:      "scaling_events_total",
+			Help:      "Count of scaling events by resource kind.",
+		},
+		[]string{"kind", "name"},
+	)
 )
 
 type apiContext struct {
@@ -56,9 +68,13 @@ func scaleKind(c *kubernetes.Clientset, kind string, ns string, name string, new
 
 func scaleDeployments(c *kubernetes.Clientset, ns string, name string, newSize int32, b *scaleBounds) error {
 	deployment, err := c.AppsV1beta2().Deployments(ns).Get(name, v1.GetOptions{})
+	if err != nil {
+		return err
+	}
 	replicas := b.newSize(*deployment.Spec.Replicas, newSize)
 	if replicas != *deployment.Spec.Replicas {
 		log.Printf("Scaling deployment '%s' from %d to %d replicas", name, deployment.Spec.Replicas, replicas)
+		scalingEvents.With(prometheus.Labels{"kind": "Deployment", "name": name}).Inc()
 		deployment.Spec.Replicas = &replicas
 		_, err = c.AppsV1beta2().Deployments(ns).Update(deployment)
 		if err != nil {
@@ -76,6 +92,7 @@ func scaleReplicaSets(c *kubernetes.Clientset, ns string, name string, newSize i
 	replicas := b.newSize(*pod.Spec.Replicas, newSize)
 	if replicas != *pod.Spec.Replicas {
 		log.Printf("Scaling replica set '%s' from %d to %d replicas", name, pod.Spec.Replicas, replicas)
+		scalingEvents.With(prometheus.Labels{"kind": "ReplicaSet", "name": name}).Inc()
 		pod.Spec.Replicas = &replicas
 		_, err = c.AppsV1beta2().ReplicaSets(ns).Update(pod)
 		if err != nil {

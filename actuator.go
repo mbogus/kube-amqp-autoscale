@@ -9,6 +9,26 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+var (
+	desiredReplicas = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: namespace,
+		Name:      "desired_replicas",
+		Help:      "Desired number of replicas.",
+	})
+	autoscaleErrors = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: namespace,
+		Name:      "autoscale_failures_total",
+		Help:      "Number of failed autoscale operations.",
+	})
+	pollCount = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: namespace,
+		Name:      "polls_total",
+		Help:      "Count of times autoscale polling loop runs.",
+	})
 )
 
 type queueStats func() (*queueMetrics, error)
@@ -31,9 +51,11 @@ func autoscale(
 		case <-quit:
 			return
 		case <-time.After(time.Duration(ctx.Interval) * time.Second):
+			pollCount.Inc()
 			qStats, err := fstats()
 			if err != nil {
 				log.Println(err)
+				autoscaleErrors.Inc()
 				continue
 			}
 
@@ -42,10 +64,12 @@ func autoscale(
 				log.Println(err)
 				continue
 			}
+			desiredReplicas.Set(float64(replicas))
 
 			err = ctx.Scaler(replicas)
 			if err != nil {
 				log.Println(err)
+				autoscaleErrors.Inc()
 			}
 		}
 	}
