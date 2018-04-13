@@ -56,6 +56,9 @@ func scaleKind(c *kubernetes.Clientset, kind string, ns string, name string, new
 
 func scaleDeployments(c *kubernetes.Clientset, ns string, name string, newSize int32, b *scaleBounds) error {
 	deployment, err := c.AppsV1beta2().Deployments(ns).Get(name, v1.GetOptions{})
+	if err != nil {
+		return err
+	}
 	replicas := b.newSize(*deployment.Spec.Replicas, newSize)
 	if replicas != *deployment.Spec.Replicas {
 		log.Printf("Scaling deployment '%s' from %d to %d replicas", name, deployment.Spec.Replicas, replicas)
