@@ -36,7 +36,7 @@ func init() {
 	flag.IntVar(&statsIntervalParam, "stats-interval", 5, "time interval between metrics gathering runs in seconds")
 	flag.IntVar(&evalIntervalsParam, "eval-intervals", 2, "number of autoscale intervals used to calculate average queue length")
 	flag.Float64Var(&statsCoverageParam, "stats-coverage", 0.75, "required percentage of statistics to calculate average queue length")
-	flag.StringVar(&dbFileParam, "db", ":memory:", "sqlite3 database filename")
+	flag.StringVar(&dbFileParam, "db", "file::memory:?cache=shared", "sqlite3 database filename")
 	flag.StringVar(&dbDirParam, "db-dir", "", "directory for sqlite3 statistics database file")
 
 	flag.BoolVar(&version, "version", false, "show version")
