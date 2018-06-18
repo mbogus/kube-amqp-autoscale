@@ -30,7 +30,7 @@ func TestDbPathNoFileDir(t *testing.T) {
 	if err == nil {
 		t.Fatal("Error expected")
 	}
-	if got, want := err.Error(), "Missing directory and/or filename for the metrics database"; got != want {
+	if got, want := err.Error(), "missing directory and/or filename for the metrics database"; got != want {
 		t.Errorf("Expected dbPath='%s', got: '%s'", want, got)
 	}
 }

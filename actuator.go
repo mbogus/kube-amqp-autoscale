@@ -79,7 +79,7 @@ func (ctx *scaleContext) newSize(avg float64, cov float64) (int32, error) {
 	var replicas int32
 	var err error
 	if cov < ctx.Coverage {
-		err = fmt.Errorf("Not enough metrics to calculate new size, required at least %.2f was %.2f metrics ratio", ctx.Coverage, cov)
+		err = fmt.Errorf("not enough metrics to calculate new size, required at least %.2f was %.2f metrics ratio", ctx.Coverage, cov)
 	} else {
 		replicas = int32(avg / float64(ctx.Threshold))
 	}

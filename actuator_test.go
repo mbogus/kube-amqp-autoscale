@@ -16,7 +16,7 @@ func TestNewSizeNoCoverage(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error")
 	}
-	if got, want := err.Error(), "Not enough metrics to calculate new size, required at least 0.75 was 0.50 metrics ratio"; got != want {
+	if got, want := err.Error(), "not enough metrics to calculate new size, required at least 0.75 was 0.50 metrics ratio"; got != want {
 		t.Errorf("Expected %s, got: %s", want, got)
 	}
 }

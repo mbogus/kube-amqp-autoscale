@@ -20,7 +20,6 @@ import (
 
 const (
 	deploymentKind            = "Deployment"
-	jobKind                   = "Job"
 	replicationControllerKind = "ReplicationController"
 	replicaSetKind            = "ReplicaSet"
 )

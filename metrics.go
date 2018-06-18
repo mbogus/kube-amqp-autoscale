@@ -28,18 +28,18 @@ func dbPath(dir string, file string) (string, error) {
 		return file, nil
 	}
 	if dir == "" || file == "" {
-		return "", errors.New("Missing directory and/or filename for the metrics database")
+		return "", errors.New("missing directory and/or filename for the metrics database")
 	}
 	fi, err := os.Stat(dir)
 	if err != nil {
 		return "", err
 	}
 	if !fi.IsDir() {
-		return "", fmt.Errorf("Valid directory name is required, got '%s'", dir)
+		return "", fmt.Errorf("valid directory name is required, got '%s'", dir)
 	}
 	filename := filepath.Join(dir, file)
 	if !isValidFile(filename) {
-		return "", fmt.Errorf("Invalid database filename '%s'", filename)
+		return "", fmt.Errorf("invalid database filename '%s'", filename)
 	}
 	return filename, nil
 }
