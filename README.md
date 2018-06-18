@@ -54,7 +54,7 @@ Run `make depend && make [build]`
 ## Runtime command-line arguments
 
 * **`amqp-uri`** required, RabbitMQ broker URI, e.g. `amqp://guest:guest@127.0.0.1:5672//`
-* **`amqp-queue`** required, RabbitMQ queue name to measure load on an application
+* **`amqp-queue`** required, RabbitMQ queue name to measure load on an application.  Use comma separator to specify multiple queues.
 * **`api-url`** required, Kubernetes API URL, e.g. `http://127.0.0.1:8080`
 * `api-user` optional, username for basic authentication on Kubernetes API
 * `api-passwd` optional, password for basic authentication on Kubernetes API
@@ -73,9 +73,10 @@ Run `make depend && make [build]`
 * `stats-interval` time interval between metrics gathering runs in seconds (default `5`)
 * `eval-intervals` number of autoscale intervals used to calculate average queue length (default `2`)
 * `stats-coverage` required percentage of statistics to calculate average queue length (default `0.75`)
-* `db` sqlite3 database filename for storing  queue length statistics (default `:memory:`)
+* `db` sqlite3 database filename for storing  queue length statistics (default `file::memory:?cache=shared`)
 * `db-dir` directory for sqlite3 statistics database file
 * `version` show version
+* `metrics-listen-address` the address to listen on for exporting Prometheus metrics (default `:9505`)
 
 
 ## Integration tests
