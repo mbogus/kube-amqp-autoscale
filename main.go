@@ -238,7 +238,7 @@ func main() {
 
 	queueNames := strings.Split(queueNameParam, ",")
 	log.Printf("Summing over %d queues: %s", len(queueNames), queueNameParam)
-	go monitorQueue(brokerURIParam, queueNames, statsIntervalParam, fsample, forever)
+	go monitorQueue(unquoteURI(brokerURIParam), queueNames, statsIntervalParam, fsample, forever)
 
 	fmetrics := func() (*queueMetrics, error) {
 		metrics, err := getMetrics(db, duration, statsIntervalParam)
