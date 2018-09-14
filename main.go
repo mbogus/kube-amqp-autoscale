@@ -256,7 +256,7 @@ func main() {
 			IncreaseLimit: increaseLimitParam,
 			DecreaseLimit: decreaseLimitParam}
 		return scale(kindParam, namespaceParam, nameParam, newSize,
-			&apiContext{URL: apiURLParam,
+			&apiContext{URL: unquoteURI(apiURLParam),
 				User:      apiUserParam,
 				Passwd:    apiPasswdParam,
 				TokenFile: apiTokenParam,
