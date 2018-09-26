@@ -27,7 +27,7 @@ func TestNewSize(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := s, int32(2); got != want {
+	if got, want := s, int32(3); got != want {
 		t.Errorf("Expected %d, got: %d", want, got)
 	}
 }
