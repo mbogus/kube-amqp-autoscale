@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"math"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -81,7 +82,7 @@ func (ctx *scaleContext) newSize(avg float64, cov float64) (int32, error) {
 	if cov < ctx.Coverage {
 		err = fmt.Errorf("not enough metrics to calculate new size, required at least %.2f was %.2f metrics ratio", ctx.Coverage, cov)
 	} else {
-		replicas = int32(avg / float64(ctx.Threshold))
+		replicas = int32(math.Ceil(avg / float64(ctx.Threshold)))
 	}
 	return replicas, err
 }
