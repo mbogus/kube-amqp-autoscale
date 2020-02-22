@@ -6,12 +6,20 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"log"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/streadway/amqp"
 )
+
+type APIQueueInfo struct {
+	Messsages int `json:"messages"`
+}
 
 var (
 	queueCountSuccesses = prometheus.NewCounter(prometheus.CounterOpts{
@@ -73,7 +81,42 @@ func monitorQueue(uri string, names []string, interval int, f saveStat, quit <-c
 	}
 }
 
+func getQueueLengthFromAPI(uri, name string) (int, error) {
+	apiQueueInfo := APIQueueInfo{}
+	err := doApiRequest(uri, name, &apiQueueInfo)
+	if err != nil {
+		return 0, err
+	}
+	return apiQueueInfo.Messsages, nil
+}
+
+func doApiRequest(uri, name string, apiQueueInfo *APIQueueInfo) error {
+	req, err := buildRequest(uri, name)
+	if err != nil {
+		return err
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	reader := new(bytes.Buffer)
+	reader.ReadFrom(resp.Body)
+	return json.Unmarshal(reader.Bytes(), &apiQueueInfo)
+}
+
+func buildRequest(uri, name string) (*http.Request, error) {
+	index := strings.LastIndex(uri, "/")
+	vhost := uri[index:]
+	uri = uri[:index]
+	uri = uri + "/api/queues" + vhost + "/" + name
+	return http.NewRequest("GET", uri, nil)
+}
+
 func getQueueLength(uri, name string) (int, error) {
+	if strings.HasPrefix(uri, "http") {
+		return getQueueLengthFromAPI(uri, name)
+	}
 	conn, err := amqp.Dial(uri)
 	if err != nil {
 		return 0, err
