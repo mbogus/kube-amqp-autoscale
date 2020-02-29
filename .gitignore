@@ -32,3 +32,4 @@ debug
 kube-amqp-autoscale
 autoscale
 cover.out
+go.sum
