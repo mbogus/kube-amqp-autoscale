@@ -9,8 +9,7 @@ services:
   - rabbitmq
 
 env:
- - AMQP_URI=amqp://guest:guest@127.0.0.1:5672// GOMAXPROCS=4
- - GO111MODULE=on
+ - AMQP_URI=amqp://guest:guest@127.0.0.1:5672// GOMAXPROCS=4 GO111MODULE=on
 
 before_install:
   - go mod tidy
