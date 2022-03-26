@@ -66,7 +66,7 @@ func scaleKind(c *kubernetes.Clientset, kind string, ns string, name string, new
 }
 
 func scaleDeployments(c *kubernetes.Clientset, ns string, name string, newSize int32, b *scaleBounds) error {
-	deployment, err := c.AppsV1beta2().Deployments(ns).Get(name, v1.GetOptions{})
+	deployment, err := c.AppsV1().Deployments(ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func scaleDeployments(c *kubernetes.Clientset, ns string, name string, newSize i
 		log.Printf("Scaling deployment '%s' from %d to %d replicas", name, *deployment.Spec.Replicas, replicas)
 		scalingEvents.With(prometheus.Labels{"kind": "Deployment", "name": name}).Inc()
 		deployment.Spec.Replicas = &replicas
-		_, err = c.AppsV1beta2().Deployments(ns).Update(deployment)
+		_, err = c.AppsV1().Deployments(ns).Update(deployment)
 		if err != nil {
 			return err
 		}
@@ -84,7 +84,7 @@ func scaleDeployments(c *kubernetes.Clientset, ns string, name string, newSize i
 }
 
 func scaleReplicaSets(c *kubernetes.Clientset, ns string, name string, newSize int32, b *scaleBounds) error {
-	pod, err := c.AppsV1beta2().ReplicaSets(ns).Get(name, v1.GetOptions{})
+	pod, err := c.AppsV1().ReplicaSets(ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func scaleReplicaSets(c *kubernetes.Clientset, ns string, name string, newSize i
 		log.Printf("Scaling replica set '%s' from %d to %d replicas", name, *pod.Spec.Replicas, replicas)
 		scalingEvents.With(prometheus.Labels{"kind": "ReplicaSet", "name": name}).Inc()
 		pod.Spec.Replicas = &replicas
-		_, err = c.AppsV1beta2().ReplicaSets(ns).Update(pod)
+		_, err = c.AppsV1().ReplicaSets(ns).Update(pod)
 		if err != nil {
 			return err
 		}
